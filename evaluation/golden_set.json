@@ -1,0 +1,8 @@
+[
+  {"query": "What is the main purpose of this system?",
+   "expected_answer": "The system answers questions using retrieval-augmented generation from the knowledge base documents."},
+  {"query": "What are the key features?",
+   "expected_answer": "Key features include knowledge retrieval, agent interfaces, and cloud automation use cases."},
+  {"query": "How should a user get started?",
+   "expected_answer": "A user should query the agent endpoint with a question related to the loaded documents."}
+]
