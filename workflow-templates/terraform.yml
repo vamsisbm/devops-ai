@@ -1,0 +1,31 @@
+name: Terraform Plan + AI Review
+on:
+  pull_request: { paths: ["terraform/**"] }
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+env:
+  AWS_REGION: us-east-2
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/GitHubActionsAgentRole
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+        working-directory: terraform
+      - run: terraform plan -no-color 2>&1 | tee /tmp/plan_output.txt
+        working-directory: terraform
+      - env:
+          GH_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          pip install boto3
+          python .github/scripts/review_tf_plan.py \
+            --plan-file /tmp/plan_output.txt \
+            --pr-number "$PR_NUMBER"
